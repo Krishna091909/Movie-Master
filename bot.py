@@ -86,14 +86,6 @@ def home():
 def run_flask():
     app.run(host='0.0.0.0', port=8080)
 
-# Function to keep the Render service alive
-def keep_alive():
-    while True:
-        try:
-            requests.get("https://movie-master-3wbl.onrender.com")  # Replace with your actual Render app URL
-        except Exception as e:
-            print(f"Keep-alive request failed: {e}")
-        time.sleep(300)  # Ping every 5 minutes
 
 def main():
     # Start Flask server in a separate thread
