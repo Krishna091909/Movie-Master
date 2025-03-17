@@ -1,3 +1,4 @@
+import os
 import asyncio
 import requests
 import time
@@ -17,6 +18,12 @@ from help import help_command
 from deletemessages import delete_message_later
 from movierequest import handle_movie_request
 from sendmovie import send_movie
+
+# Fetch bot token from environment variable
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+
+if not BOT_TOKEN:
+    raise ValueError("❌ BOT_TOKEN environment variable is missing! Set it before running the script.")
 
 # Flask app for keeping the bot alive
 app = Flask(__name__)
@@ -79,9 +86,6 @@ def home():
 def run_flask():
     app.run(host='0.0.0.0', port=8080)
 
-# Replace this with your actual bot token
-BOT_TOKEN = "7903162641:AAH9JQxde3XtgLUirbCoDEvgplaqZa4xLg4"
-
 # Function to keep the Render service alive
 def keep_alive():
     while True:
@@ -126,7 +130,7 @@ def main():
     tg_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_movie_request))
     tg_app.add_handler(CallbackQueryHandler(send_movie))
 
-    print("Bot is running...")
+    print("✅ Bot is running...")
     tg_app.run_polling()
 
 if __name__ == "__main__":
