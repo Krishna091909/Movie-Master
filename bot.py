@@ -86,7 +86,7 @@ BOT_TOKEN = "7903162641:AAH9JQxde3XtgLUirbCoDEvgplaqZa4xLg4"
 def keep_alive():
     while True:
         try:
-            requests.get("https://your-render-app-url.onrender.com")  # Replace with your actual Render app URL
+            requests.get("https://movie-master-3wbl.onrender.com")  # Replace with your actual Render app URL
         except Exception as e:
             print(f"Keep-alive request failed: {e}")
         time.sleep(300)  # Ping every 5 minutes
