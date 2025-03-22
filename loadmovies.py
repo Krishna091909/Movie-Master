@@ -10,10 +10,12 @@ client = gspread.authorize(creds)
 SHEET_ID = "1ZBNk7zJ5bPHhfb2UgLPC27A-phWkhlvtBHiHH_JjsyU" # Replace with your actual Sheet ID
 sheet = client.open_by_key(SHEET_ID).sheet1
 
-# Load movies from Google Sheets
+# Load movies from Google Sheets (Reversed Order)
 def load_movies():
     movies = {}
     data = sheet.get_all_records()
+    data.reverse()  # Reverse the order to list movies from bottom to top
+
     for row in data:
         movies[row["Movie Name"]] = {
             "file_id": row["File ID"],
