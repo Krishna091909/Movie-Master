@@ -86,13 +86,22 @@ def home():
 def run_flask():
     app.run(host='0.0.0.0', port=8080)
 
+# Keep-alive function to prevent Render from sleeping
+def keep_alive():
+    while True:
+        try:
+            requests.get("https://your-render-app.onrender.com")  # Replace with your Render app URL
+            print("✅ Keep-alive ping sent!")
+        except Exception as e:
+            print(f"❌ Keep-alive request failed: {e}")
+        time.sleep(49)  # Ping every 10 minutes
 
 def main():
     # Start Flask server in a separate thread
     app_thread = Thread(target=run_flask)
     app_thread.start()
 
-    # Start keep-alive thread for Render
+    # Start keep-alive thread
     keep_alive_thread = Thread(target=keep_alive)
     keep_alive_thread.start()
 
