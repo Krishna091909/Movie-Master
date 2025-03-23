@@ -22,13 +22,13 @@ from loadmovies import load_movies
 from help import help_command
 from movierequest import handle_movie_request
 from sendmovie import send_movie
-from filters import register_filters  # Import filters for link banning & auto-delete
+
 
 # Fetch bot token from environment variable
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 if not BOT_TOKEN:
-    raise ValueError("❌ BOT_TOKEN environment variable is missing! Set it before running the script.")
+    raise ValueError("BOT_TOKEN environment variable is missing! Set it before running the script.")
 
 # Flask app for keeping the bot alive
 app = Flask(__name__)
@@ -46,9 +46,9 @@ def keep_alive():
     while True:
         try:
             response = requests.get(url)
-            print(f"✅ Keep-alive ping sent! Status: {response.status_code}")
+            print(f"Keep-alive ping sent! Status: {response.status_code}")
         except Exception as e:
-            print(f"❌ Keep-alive request failed: {e}")
+            print(f"Keep-alive request failed: {e}")
         time.sleep(49)  # Ping every 49 seconds
 
 def main():
@@ -61,8 +61,6 @@ def main():
     # Initialize Telegram bot application
     tg_app = Application.builder().token(BOT_TOKEN).build()
 
-    # Register filters (Ban Links & Auto-Delete Messages)
-    register_filters(tg_app)
 
     # Command Handlers
     tg_app.add_handler(CommandHandler("start", help_command))
@@ -87,7 +85,7 @@ def main():
     tg_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_movie_request))
     tg_app.add_handler(CallbackQueryHandler(send_movie))
 
-    print("✅ Bot is running...")
+    print("Bot is running...")
     tg_app.run_polling()
 
 if __name__ == "__main__":
