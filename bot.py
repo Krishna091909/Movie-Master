@@ -1,8 +1,9 @@
+
 import os
 import asyncio
 import requests
 import time
-from flask import Flask, request, send_file
+from flask import Flask, send_file
 from threading import Thread
 from telegram import Update
 from telegram.ext import (
@@ -17,6 +18,7 @@ from addmovie import (
 from removemovie import remove_movie_command
 from getfile import file_info
 from listmovies import list_movies
+from loadmovies import load_movies
 from help import help_command
 from movierequest import handle_movie_request
 from sendmovie import send_movie
@@ -24,34 +26,19 @@ from filters import register_filters  # Import filters for link banning & auto-d
 
 # Fetch bot token from environment variable
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
-WEBHOOK_URL = "https://movie-master-68nu.onrender.com/webhook"  # Replace with your Render app URL
 
 if not BOT_TOKEN:
     raise ValueError("❌ BOT_TOKEN environment variable is missing! Set it before running the script.")
 
-# Flask app for handling webhooks
+# Flask app for keeping the bot alive
 app = Flask(__name__)
 
-@app.route("/")
+@app.route('/')
 def home():
     return send_file("index.html")  # Serve index.html directly
 
-@app.route("/webhook", methods=["POST"])
-async def webhook():
-    """Receive and process Telegram updates via webhook."""
-    update = Update.de_json(request.get_json(), bot)
-    await application.process_update(update)
-    return "OK", 200
-
-async def set_webhook():
-    """Set the webhook for Telegram bot."""
-    bot = Application.builder().token(BOT_TOKEN).build().bot
-    await bot.set_webhook(WEBHOOK_URL)
-    print(f"✅ Webhook set at {WEBHOOK_URL}")
-
 def run_flask():
-    """Run Flask app for webhook handling."""
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host='0.0.0.0', port=8080)
 
 # Keep-alive function to prevent Render from sleeping
 def keep_alive():
@@ -64,25 +51,28 @@ def keep_alive():
             print(f"❌ Keep-alive request failed: {e}")
         time.sleep(49)  # Ping every 49 seconds
 
-async def main():
-    """Initialize bot, set webhook, and run Flask."""
-    global application
+def main():
+    # Start Flask server in a separate thread
+    Thread(target=run_flask, daemon=True).start()
 
-    # Create Telegram bot application
-    application = Application.builder().token(BOT_TOKEN).build()
+    # Start keep-alive thread
+    Thread(target=keep_alive, daemon=True).start()
+
+    # Initialize Telegram bot application
+    tg_app = Application.builder().token(BOT_TOKEN).build()
 
     # Register filters (Ban Links & Auto-Delete Messages)
-    register_filters(application)
+    register_filters(tg_app)
 
     # Command Handlers
-    application.add_handler(CommandHandler("start", help_command))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(MessageHandler(filters.Document.ALL, file_info))
-    application.add_handler(CommandHandler("removemovie", remove_movie_command))
-    application.add_handler(CommandHandler("listmovies", list_movies))
+    tg_app.add_handler(CommandHandler("start", help_command))
+    tg_app.add_handler(CommandHandler("help", help_command))
+    tg_app.add_handler(MessageHandler(filters.Document.ALL, file_info))
+    tg_app.add_handler(CommandHandler("removemovie", remove_movie_command))
+    tg_app.add_handler(CommandHandler("listmovies", list_movies))
 
     # Conversation Handler for adding movies step by step
-    application.add_handler(ConversationHandler(
+    tg_app.add_handler(ConversationHandler(
         entry_points=[CommandHandler("addmovie", start_add_movie)],
         states={
             MOVIE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, movie_name_handler)],
@@ -94,20 +84,11 @@ async def main():
     ))
 
     # Message Handlers
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_movie_request))
-    application.add_handler(CallbackQueryHandler(send_movie))
+    tg_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_movie_request))
+    tg_app.add_handler(CallbackQueryHandler(send_movie))
 
-    # Set webhook
-    await set_webhook()
-
-    print("✅ Bot is running via webhook...")
+    print("✅ Bot is running...")
+    tg_app.run_polling()
 
 if __name__ == "__main__":
-    # Start Flask server in a separate thread
-    Thread(target=run_flask, daemon=True).start()
-
-    # Start keep-alive thread
-    Thread(target=keep_alive, daemon=True).start()
-
-    # Start bot asynchronously
-    asyncio.run(main())
+    main()
