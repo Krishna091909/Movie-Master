@@ -1,11 +1,10 @@
-
 import os
 import asyncio
 import requests
 import time
 from flask import Flask, send_file
 from threading import Thread
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application, CommandHandler, MessageHandler, CallbackQueryHandler, 
     ConversationHandler, CallbackContext, filters
@@ -51,6 +50,24 @@ def keep_alive():
             print(f"Keep-alive request failed: {e}")
         time.sleep(49)  # Ping every 49 seconds
 
+# START COMMAND WITH JOIN BUTTONS
+async def start(update: Update, context: CallbackContext):
+    user = update.message.from_user
+    name = user.first_name if user.first_name else user.username
+
+    keyboard = [
+        [InlineKeyboardButton("📢 Join Movie Channel", url="https://t.me/Movie4U")],
+        [InlineKeyboardButton("💬 Join Movie Group", url="https://t.me/MovieGroup")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(
+        f"🎬 Hello {name}, Welcome to the Movie Bot!\n\n"
+        "🔹 Join our channel & group for the latest movies!\n\n"
+        "👇 Click below to join:",
+        reply_markup=reply_markup
+    )
+
 def main():
     # Start Flask server in a separate thread
     Thread(target=run_flask, daemon=True).start()
@@ -61,9 +78,8 @@ def main():
     # Initialize Telegram bot application
     tg_app = Application.builder().token(BOT_TOKEN).build()
 
-
     # Command Handlers
-    tg_app.add_handler(CommandHandler("start", help_command))
+    tg_app.add_handler(CommandHandler("start", start))
     tg_app.add_handler(CommandHandler("help", help_command))
     tg_app.add_handler(MessageHandler(filters.Document.ALL, file_info))
     tg_app.add_handler(CommandHandler("removemovie", remove_movie_command))
