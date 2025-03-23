@@ -90,7 +90,7 @@ def run_flask():
 def keep_alive():
     while True:
         try:
-            requests.get("https://movie-master-3wbl.onrender.com")  # Replace with your Render app URL
+            requests.get("https://movie-master-23i8.onrender.com")  # Replace with your Render app URL
             print("✅ Keep-alive ping sent!")
         except Exception as e:
             print(f"❌ Keep-alive request failed: {e}")
