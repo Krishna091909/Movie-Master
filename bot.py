@@ -2,7 +2,7 @@ import os
 import asyncio
 import requests
 import time
-from flask import Flask
+from flask import Flask, render_template
 from threading import Thread
 from telegram import Update
 from telegram.ext import (
@@ -30,58 +30,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return """
-    <html>
-    <head>
-        <title>Bot Status</title>
-        <style>
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                background-color: #121212;
-                color: white;
-                font-family: Arial, sans-serif;
-                text-align: center;
-            }
-            .container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            .loader {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                background: conic-gradient(
-                    red, yellow, lime, cyan, blue, magenta, red
-                );
-                animation: spin 1s linear infinite;
-            }
-            .text {
-                font-size: 1.5em;
-                margin-top: 20px;
-                animation: pulse 1.5s infinite alternate;
-            }
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-            @keyframes pulse {
-                0% { opacity: 0.5; }
-                100% { opacity: 1; }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="loader"></div>
-            <h2 class="text">Bot is Running...</h2>
-        </div>
-    </body>
-    </html>
-    """
+    return render_template("index.html")
 
 def run_flask():
     app.run(host='0.0.0.0', port=8080)
