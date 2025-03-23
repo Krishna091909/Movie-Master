@@ -56,8 +56,8 @@ async def start(update: Update, context: CallbackContext):
     name = user.first_name if user.first_name else user.username
 
     keyboard = [
-        [InlineKeyboardButton("📢 Join Movie Channel", url="https://t.me/Movie4U")],
-        [InlineKeyboardButton("💬 Join Movie Group", url="https://t.me/MovieGroup")]
+        [InlineKeyboardButton("📢 Join Movie Channel", url="https://t.me/+MhdyDUCdRR1lNGNl")],
+        [InlineKeyboardButton("💬 Join Movie Group", url="https://t.me/+fq8kwbQPGfsxZTU1")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
