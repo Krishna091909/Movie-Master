@@ -42,7 +42,7 @@ def run_flask():
 
 # Keep-alive function to prevent Render from sleeping
 def keep_alive():
-    url = "https://movie-master-68nu.onrender.com"  # Replace with your Render app URL
+    url = "https://movie-master-fs4g.onrender.com"  # Replace with your Render app URL
     while True:
         try:
             response = requests.get(url)
