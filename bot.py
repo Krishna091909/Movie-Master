@@ -15,9 +15,9 @@ from getfile import file_info
 from listmovies import list_movies
 from loadmovies import load_movies
 from help import help_command
-from deletemessages import delete_message_later
 from movierequest import handle_movie_request
 from sendmovie import send_movie
+from filters import register_filters  # Import the filters file
 
 # Fetch bot token from environment variable
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
@@ -57,13 +57,16 @@ def main():
     # Initialize Telegram bot application
     tg_app = Application.builder().token(BOT_TOKEN).build()
 
+    # Register filters (Ban Links & Auto-Delete Messages)
+    register_filters(tg_app)
+
     # Command Handlers
     tg_app.add_handler(CommandHandler("start", help_command))
     tg_app.add_handler(CommandHandler("help", help_command))
     tg_app.add_handler(MessageHandler(filters.Document.ALL, file_info))
     tg_app.add_handler(CommandHandler("removemovie", remove_movie_command))
     tg_app.add_handler(CommandHandler("listmovies", list_movies))
-    
+
     # Conversation Handler for adding movies step by step
     tg_app.add_handler(ConversationHandler(
         entry_points=[CommandHandler("addmovie", start_add_movie)],
