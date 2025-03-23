@@ -1,4 +1,3 @@
-
 import os
 import asyncio
 import requests
@@ -22,7 +21,6 @@ from loadmovies import load_movies
 from help import help_command
 from movierequest import handle_movie_request
 from sendmovie import send_movie
-
 
 # Fetch bot token from environment variable
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
@@ -51,6 +49,12 @@ def keep_alive():
             print(f"Keep-alive request failed: {e}")
         time.sleep(49)  # Ping every 49 seconds
 
+# New function to handle direct text messages
+async def handle_direct_message(update: Update, context: CallbackContext):
+    """Handles direct messages without requiring /start"""
+    text = update.message.text
+    await update.message.reply_text(f"Received your message: {text}")
+
 def main():
     # Start Flask server in a separate thread
     Thread(target=run_flask, daemon=True).start()
@@ -61,9 +65,7 @@ def main():
     # Initialize Telegram bot application
     tg_app = Application.builder().token(BOT_TOKEN).build()
 
-
     # Command Handlers
-    #tg_app.add_handler(CommandHandler("start", help_command))
     tg_app.add_handler(CommandHandler("help", help_command))
     tg_app.add_handler(MessageHandler(filters.Document.ALL, file_info))
     tg_app.add_handler(CommandHandler("removemovie", remove_movie_command))
@@ -82,7 +84,7 @@ def main():
     ))
 
     # Message Handlers
-    tg_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_movie_request))
+    tg_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_direct_message))  # Direct message handler
     tg_app.add_handler(CallbackQueryHandler(send_movie))
 
     print("Bot is running...")
