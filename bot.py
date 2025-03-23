@@ -63,7 +63,7 @@ def main():
 
 
     # Command Handlers
-    tg_app.add_handler(CommandHandler("start", help_command))
+    #tg_app.add_handler(CommandHandler("start", help_command))
     tg_app.add_handler(CommandHandler("help", help_command))
     tg_app.add_handler(MessageHandler(filters.Document.ALL, file_info))
     tg_app.add_handler(CommandHandler("removemovie", remove_movie_command))
