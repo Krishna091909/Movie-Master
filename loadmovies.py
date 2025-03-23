@@ -1,9 +1,15 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import os
 
 # Google Sheets Authentication
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+credentials_path = "/etc/secrets/credentials.json"  # Correct path for Render secrets
+
+if os.path.exists(credentials_path):
+    creds = ServiceAccountCredentials.from_json_keyfile_name(credentials_path, scope)
+else:
+    raise FileNotFoundError("❌ credentials.json not found in /etc/secrets/")
 client = gspread.authorize(creds)
 
 # Google Sheet ID
