@@ -2,14 +2,18 @@ import os
 import asyncio
 import requests
 import time
-from flask import Flask, render_template
+from flask import Flask, send_file
 from threading import Thread
 from telegram import Update
 from telegram.ext import (
     Application, CommandHandler, MessageHandler, CallbackQueryHandler, 
     ConversationHandler, CallbackContext, filters
 )
-from addmovie import start_add_movie, movie_name_handler, file_id_handler, file_size_handler, file_name_handler, cancel, MOVIE_NAME, FILE_ID, FILE_SIZE, FILE_NAME
+from addmovie import (
+    start_add_movie, movie_name_handler, file_id_handler, 
+    file_size_handler, file_name_handler, cancel, 
+    MOVIE_NAME, FILE_ID, FILE_SIZE, FILE_NAME
+)
 from removemovie import remove_movie_command
 from getfile import file_info
 from listmovies import list_movies
@@ -17,7 +21,7 @@ from loadmovies import load_movies
 from help import help_command
 from movierequest import handle_movie_request
 from sendmovie import send_movie
-from filters import register_filters  # Import the filters file
+from filters import register_filters  # Import filters for link banning & auto-delete
 
 # Fetch bot token from environment variable
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
@@ -30,29 +34,28 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template("index.html")
+    return send_file("index.html")  # Serve index.html directly
 
 def run_flask():
     app.run(host='0.0.0.0', port=8080)
 
 # Keep-alive function to prevent Render from sleeping
 def keep_alive():
+    url = "https://movie-master-68nu.onrender.com"  # Replace with your Render app URL
     while True:
         try:
-            requests.get("https://movie-master-68nu.onrender.com")  # Replace with your Render app URL
-            print("✅ Keep-alive ping sent!")
+            response = requests.get(url)
+            print(f"✅ Keep-alive ping sent! Status: {response.status_code}")
         except Exception as e:
             print(f"❌ Keep-alive request failed: {e}")
-        time.sleep(49)  # Ping every 10 minutes
+        time.sleep(49)  # Ping every 49 seconds
 
 def main():
     # Start Flask server in a separate thread
-    app_thread = Thread(target=run_flask)
-    app_thread.start()
+    Thread(target=run_flask, daemon=True).start()
 
     # Start keep-alive thread
-    keep_alive_thread = Thread(target=keep_alive)
-    keep_alive_thread.start()
+    Thread(target=keep_alive, daemon=True).start()
 
     # Initialize Telegram bot application
     tg_app = Application.builder().token(BOT_TOKEN).build()
