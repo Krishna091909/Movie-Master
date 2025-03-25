@@ -4,7 +4,7 @@ from telegram.ext import CallbackContext
 from loadmovies import load_movies
 from deletemessages import delete_message_later
 
-FILMSTREAM_BOT_USERNAME = "@YourFilestreamBot"  # Replace with your actual Filestream bot username
+FILMSTREAM_BOT_USERNAME = "@CC_FileStream_bot"  # Replace with your actual Filestream bot username
 
 async def send_movie(update: Update, context: CallbackContext):
     query = update.callback_query
