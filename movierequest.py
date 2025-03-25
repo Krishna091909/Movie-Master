@@ -13,6 +13,6 @@ async def handle_movie_request(update: Update, context: CallbackContext):
             for name in matched_movies
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("🎬 Found these movies:", reply_markup=reply_markup)
+        await update.message.reply_text("🎥 Lights, Camera, Action! Choose Your Film\n\n\n🕒 Hurry! This message vanishes in 5 minutes!", reply_markup=reply_markup)
     else:
         await update.message.reply_text("❌ Movie not found! Please check the spelling.")
