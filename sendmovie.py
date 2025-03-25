@@ -1,5 +1,5 @@
 import asyncio
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import Update
 from telegram.ext import CallbackContext
 from loadmovies import load_movies
 from deletemessages import delete_message_later
@@ -31,17 +31,8 @@ async def send_movie(update: Update, context: CallbackContext):
         # Get the message object containing movie selection buttons
         user_message = query.message  
 
-        # Send a confirmation message in the group with a button
-        buttons = [[InlineKeyboardButton("📩 Check DM", url=f"tg://user?id={user_id}")]]
-        msg = await query.message.reply_text(
-            "⏳ This message and movie selection buttons will be deleted after 5 minutes.",
-            reply_markup=InlineKeyboardMarkup(buttons)
-        )
-
-        # Schedule deletion after 5 minutes (300 seconds)
-        asyncio.create_task(delete_message_later(sent_message, 300))  # Delete DM message
-        asyncio.create_task(delete_message_later(msg, 300))  # Delete confirmation message
-        asyncio.create_task(delete_message_later(user_message, 300))  # Delete movie selection buttons
+        # Schedule deletion of movie selection buttons **AFTER 5 MINUTES**
+        asyncio.create_task(delete_message_later(user_message, 300))  
 
         # Also delete the user's search message after 5 minutes
         search_message = context.user_data.get("last_search_message")
