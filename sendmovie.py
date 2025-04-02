@@ -20,12 +20,16 @@ async def send_movie(update: Update, context: CallbackContext):
         file_size = movie_data["file_size"]
         file_name = movie_data["file_name"]
 
+        # Escape special characters in MarkdownV2
+        escaped_file_name = file_name.replace("-", "\\-").replace(".", "\\.").replace("(", "\\(").replace(")", "\\)")
+        escaped_file_size = file_size.replace("-", "\\-").replace(".", "\\.").replace("(", "\\(").replace(")", "\\)")
+
         # Send movie file in DM with Filestream bot username
         sent_message = await context.bot.send_document(
             chat_id=user_id, 
             document=file_id, 
-            caption=f"🎬 *{file_name}*\n📦 *Size:* {file_size}\n\n🤖 Forward this to {FILMSTREAM_BOT_USERNAME} to get fast download & online streaming links.",
-            parse_mode="Markdown"
+            caption=f"🎬 *{escaped_file_name}*\n📦 *Size:* {escaped_file_size}\n\n🤖 Forward this to {FILMSTREAM_BOT_USERNAME} to get fast download & online streaming links.",
+            parse_mode="MarkdownV2"
         )
 
         # Get the message object containing movie selection buttons
